@@ -1,0 +1,10 @@
+CITY_NAME="Reykjavik"
+COUNTRY='Iceland'
+SEASON="Winter"
+CURRENT_DATE="2026-06-01"
+
+CLIMATE_INFO="
+Reykjavik features a subpolar oceanic climate. 
+Despite its high northern latitude, temperatures rarely drop below -15 °C (5 °F) in winter due to the warm North Atlantic Current.
+The weather is notoriously volatile, changing rapidly from clear skies to snowstorms or rain within a few hours.
+"
