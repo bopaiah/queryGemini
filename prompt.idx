@@ -1,0 +1,4 @@
+prompt_name, prompt_filepath, env_filepath
+prompt1, ./prompt_-1.txt. ./prompt_1_args.txt
+prompt2, ./prompt_file.txt. ./prompt_input.txt
+prompt3, ./prompt_profile.txt. ./prompt_env.txt

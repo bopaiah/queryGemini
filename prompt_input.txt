@@ -1,10 +1,9 @@
-CITY_NAME="Reykjavik"
-COUNTRY='Iceland'
-SEASON="Winter"
-CURRENT_DATE="2026-06-01"
-
-CLIMATE_INFO="
-Reykjavik features a subpolar oceanic climate. 
-Despite its high northern latitude, temperatures rarely drop below -15 °C (5 °F) in winter due to the warm North Atlantic Current.
-The weather is notoriously volatile, changing rapidly from clear skies to snowstorms or rain within a few hours.
-"
+CITY_NAME=Tokyo
+COUNTRY=Japan
+SEASON=Spring
+CURRENT_DATE=2026-04-05
+CLIMATE_INFO=```
+Tokyo features a humid subtropical climate characterized by warm, wet summers and mild winters.
+Spring is famous for cherry blossoms (sakura) blooming, bringing volatile but generally pleasant temperatures ranging between 10°C and 20°C.
+Autumn is similarly mild and scenic with vibrant fall foliage.
+```

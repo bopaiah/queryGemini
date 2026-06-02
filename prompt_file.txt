@@ -1,15 +1,15 @@
 # WEATHER FORECAST & CITY REPORT TEMPLATE
-
+{{file:./weatherdata.md}}
 You are a professional meteorologist and geographer. 
 
 Please analyze the weather and geographic profile of the following city:
 
-- **City Name**: $CITY_NAME
-- **Country**: $COUNTRY
-- **Typical Season**: $SEASON
+- **City Name**: {{CITY_NAME}}
+- **Country**: {{COUNTRY}}
+- **Typical Season**: {{SEASON}}
 
 ## Climate & Geographic Context
-$CLIMATE_INFO
+{{CLIMATE_INFO}}
 
 ## Task
-Based on the current date of $CURRENT_DATE and the details above, provide a comprehensive 3-day forecast summary and list top 3 geographic highlights or local travel tips for this city.
+Based on the current date of {{CURRENT_DATE}} and the details above, provide a comprehensive 3-day forecast summary and list top 3 geographic highlights or local travel tips for this city.
