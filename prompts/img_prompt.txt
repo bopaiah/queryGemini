@@ -1,0 +1,2 @@
+Give the face a biker look. Add a moustach, a goggle to the face and a bandana.
+Return understanding of the original image.

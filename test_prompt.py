@@ -1,33 +1,49 @@
 # -*- coding: utf-8 -*-
 """
-Verification Script for prompt_utils (Realworld Prompt2 Test)
+Test Script: prompt_utils.getPrompt
+Author: Bopaiah Mekerira
+
+Description:
+    Verifies that getPrompt correctly loads and resolves the 'prompt2' template
+    from prompt.idx, substituting dynamic variables at runtime.
+
+Usage:
+    python test_prompt.py
 """
 
-import os
+# --- Standard library imports ---
+import datetime
 import sys
+
+# --- Local imports ---
 from prompt_utils import getPrompt
 
+
 def run_test():
+    """
+    Loads the 'prompt2' prompt template and prints the resolved output.
+
+    Overrides template variables with today's date and a seasonal label.
+    Output is written to stdout; errors are written to stderr.
+    """
     print("--- Running getPrompt Test on prompt2 (Tokyo Weather Template) ---", file=sys.stderr)
-    
-    import datetime
-    # Define JSON arguments to dynamically override Tokyo defaults with Kyoto specifics
-    json_arg = {
+
+    json_args = {
         "CURRENT_DATE": datetime.date.today().isoformat(),
         "SEASON": "Spring Cherry Blossom Peak"
     }
-    
-    # Run the getPrompt function for "prompt2"
+
     try:
-        updated_prompt = getPrompt("prompt2", json_arg)
+        resolved_prompt = getPrompt("prompt2", json_args)
         try:
-            print(updated_prompt)
+            print(resolved_prompt)
         except UnicodeEncodeError:
             sys.stdout.flush()
-            sys.stdout.buffer.write(updated_prompt.encode('utf-8'))
+            sys.stdout.buffer.write(resolved_prompt.encode("utf-8"))
             sys.stdout.flush()
     except Exception as e:
-        print("Error during test:", e, file=sys.stderr)
+        print(f"Error during test: {e}", file=sys.stderr)
+
 
 if __name__ == "__main__":
     run_test()
