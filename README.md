@@ -145,10 +145,15 @@ The system instruction block is extracted and passed as the model's system instr
 
 ## CLI Usage (`query_gemini.py`)
 
-`query_gemini.py` is the CLI entry point. It delegates all Gemini API calls to `gemini_utils.query_gemini()` (using the `GEO` prefix) and prompt loading to `prompt_utils.getPrompt()`. No direct `google.genai` imports are used in the CLI.
+`query_gemini.py` is the CLI entry point. It delegates all Gemini API calls to `gemini_utils.query_gemini()` and prompt loading to `prompt_utils.getPrompt()`. No direct `google.genai` imports are used in the CLI.
+
+The `--model` flag accepts either a **model prefix** (e.g. `GEO`, `IMAGE`) or a **full model name** (e.g. `gemini-2.5-flash`):
+- **Prefix** (e.g. `--model GEO`): uses `GEO_MODEL`, `GEO_API_KEY`, and `GEO_CONFIG` from `.env`
+- **Model name** (e.g. `--model gemini-2.5-flash`): overrides `GEO_MODEL` while keeping `GEO_API_KEY` and `GEO_CONFIG`
+- Defaults to `GEO` if not specified
 
 ```bash
-python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL] [--env PATH] [--list]
+python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL_OR_PREFIX] [--env PATH] [--list]
 ```
 
 ### Arguments
@@ -158,24 +163,30 @@ python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL] 
 | `prompt` | Raw prompt string to send directly to the model |
 | `-p`, `--prompt-name` | Name of a prompt template in `prompt.idx` |
 | `-a`, `--args` | JSON string of variables to substitute into the template |
-| `--model` | Gemini model name (overrides `GEO_MODEL` in `.env`) |
+| `--model` | Model prefix (e.g. `GEO`, `IMAGE`) or full model name (e.g. `gemini-2.5-flash`). Defaults to `GEO`. |
 | `--env` | Path to `.env` file (default: `./.env`) |
 | `--list` | List all available Gemini models and exit |
 
 ### Examples
 
 ```bash
-# Raw prompt
+# Raw prompt (uses GEO prefix by default)
 python query_gemini.py "Explain the effect of el-nino on weather"
 
-# Named template
+# Named template with default GEO prefix
 python query_gemini.py -p prompt2
 
-# Named template with variable overrides
-python query_gemini.py -p prompt2 -a '{"CURRENT_DATE": "2026-06-02", "SEASON": "Summer"}'
+# Explicitly specify the GEO prefix
+python query_gemini.py -p prompt2 --model GEO
 
-# Override model and env file
-python query_gemini.py -p prompt2 --env .env --model gemini-2.5-flash
+# Use the IMAGE model prefix
+python query_gemini.py -p prompt2 --model IMAGE
+
+# Named template with variable overrides and GEO prefix
+python query_gemini.py -p prompt2 -a '{"CURRENT_DATE": "2026-06-02", "SEASON": "Summer"}' --model GEO
+
+# Override with a specific model name (keeps GEO_API_KEY and GEO_CONFIG)
+python query_gemini.py -p prompt2 --model gemini-2.5-flash
 
 # List available models
 python query_gemini.py --list
