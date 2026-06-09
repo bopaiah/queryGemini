@@ -15,6 +15,7 @@ queryGemini/
 ├── gemini_utils.py      # Core Gemini API utilities (text, image analysis, image editing)
 ├── prompt_utils.py      # Prompt loader — resolves templates, variables, and file inclusions
 ├── env_utils.py         # Environment resolver — .env, GCP Secret Manager, caching
+├── query_gemini.py      # CLI entry point — delegates to gemini_utils and prompt_utils
 ├── test_prompt.py       # Sample test code for prompt loading and variable substitution
 ├── test_query.py        # Integration test for query_gemini() using getPrompt('prompt2')
 ├── test_image_ops.py    # Sample test code for image analysis and editing operations
@@ -142,6 +143,10 @@ The system instruction block is extracted and passed as the model's system instr
 ---
 
 
+## CLI Usage (`query_gemini.py`)
+
+`query_gemini.py` is the CLI entry point. It delegates all Gemini API calls to `gemini_utils.query_gemini()` (using the `GEO` prefix) and prompt loading to `prompt_utils.getPrompt()`. No direct `google.genai` imports are used in the CLI.
+
 ```bash
 python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL] [--env PATH] [--list]
 ```
@@ -153,7 +158,7 @@ python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL] 
 | `prompt` | Raw prompt string to send directly to the model |
 | `-p`, `--prompt-name` | Name of a prompt template in `prompt.idx` |
 | `-a`, `--args` | JSON string of variables to substitute into the template |
-| `--model` | Gemini model name (overrides `MODEL` in `.env`) |
+| `--model` | Gemini model name (overrides `GEO_MODEL` in `.env`) |
 | `--env` | Path to `.env` file (default: `./.env`) |
 | `--list` | List all available Gemini models and exit |
 
