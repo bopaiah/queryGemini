@@ -12,15 +12,22 @@ Developed by **Bopaiah Mekerira**.
 
 ```
 queryGemini/
-├── query_gemini.py      # CLI entry point — query Gemini from the command line
 ├── gemini_utils.py      # Core Gemini API utilities (text, image analysis, image editing)
 ├── prompt_utils.py      # Prompt loader — resolves templates, variables, and file inclusions
 ├── env_utils.py         # Environment resolver — .env, GCP Secret Manager, caching
+├── test_prompt.py       # Sample test code for prompt loading and variable substitution
+├── test_query.py        # Integration test for query_gemini() using getPrompt('prompt2')
+├── test_image_ops.py    # Sample test code for image analysis and editing operations
+├── face.jpg             # Sample input image for image operations
+├── face_edited.jpg      # Sample output image from edit_image()
 ├── prompts/
 │   ├── prompt.idx       # Prompt index (CSV): maps prompt names to files
-│   ├── *.txt            # Prompt template files
-│   └── *.txt            # Prompt-specific env/args files
+│   ├── prompt_file.txt  # Example prompt template
+│   ├── prompt_input.txt # Example prompt-specific args/env file
+│   ├── img_prompt.txt   # Image-related prompt template
+│   └── weatherdata.md   # Sample data file for weather prompt
 ├── .env                 # Local configuration (API keys, model names, paths)
+├── .env_example.txt     # Example .env file with all supported variables
 ├── requirements.txt     # Python dependencies
 └── README.md
 ```
@@ -134,7 +141,6 @@ The system instruction block is extracted and passed as the model's system instr
 
 ---
 
-## CLI Usage (`query_gemini.py`)
 
 ```bash
 python query_gemini.py [prompt] [-p PROMPT_NAME] [-a JSON_ARGS] [--model MODEL] [--env PATH] [--list]
@@ -253,8 +259,8 @@ project_root = get_env("PROJECT_ROOT")
 | `list_gemini_models(api_key)` | List all available Gemini models |
 | `query_gemini(model_prefix, contents)` | Send a text prompt and return response + token usage |
 | `analyze_image(model_prefix, prompt, image_path)` | Upload image and get text analysis |
-| `edit_image(model_prefix, prompt, image_path, output_path)` | Upload image, edit it, save result |
-| `parse_response_text(response_text)` | Parse response into `{"content_type", "data"}` envelope |
+| `edit_image(model_prefix, prompt, image_path, output_path)` | Upload image, edit it, save result. Defaults to `TEXT+IMAGE` response modalities so text descriptions are returned alongside the edited image (override via `IMAGE_CONFIG` in `.env`) |
+| `parse_response_text(response_text)` | Parse response into `{"content_type", "data"}` envelope. Handles raw JSON (with or without markdown fences), including responses containing unescaped control characters (e.g. literal newlines inside string values). |
 | `extract_token_usage(usage)` | Extract token counts from response metadata |
 
 ---

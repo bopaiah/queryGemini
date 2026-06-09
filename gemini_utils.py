@@ -143,9 +143,11 @@ def parse_response_text(response_text):
             - "data": parsed JSON object (dict/list) or plain text string
     """
     if not response_text or not isinstance(response_text, str):
+        # None or empty string: return a clear empty text envelope
+        # (e.g. when the model returns only image parts with no text)
         return {
             "content_type": "text",
-            "data": response_text
+            "data": ""
         }
 
     original_text = response_text
@@ -166,17 +168,39 @@ def parse_response_text(response_text):
                 cleaned = cleaned[start_idx:].strip()
             break
 
-    # 2. Attempt JSON parse
-    try:
+    def _try_parse_json(text):
+        """Try strict parse first, then lenient (allows unescaped control chars)."""
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+        try:
+            return json.loads(text, strict=False)
+        except json.JSONDecodeError:
+            return None
+
+    # 2. Attempt JSON parse on the cleaned/fenced content
+    parsed = _try_parse_json(cleaned)
+    if parsed is not None:
         return {
             "content_type": "json",
-            "data": json.loads(cleaned)
+            "data": parsed
         }
-    except json.JSONDecodeError:
-        return {
-            "content_type": "text",
-            "data": cleaned if extracted_from_fence else original_text
-        }
+
+    # 3. If not extracted from a fence, also try parsing the original text as JSON
+    #    (handles cases where the model returns raw JSON without markdown fences)
+    if not extracted_from_fence:
+        parsed = _try_parse_json(original_text.strip())
+        if parsed is not None:
+            return {
+                "content_type": "json",
+                "data": parsed
+            }
+
+    return {
+        "content_type": "text",
+        "data": cleaned if extracted_from_fence else original_text
+    }
 
 
 def extract_token_usage(usage):
@@ -433,7 +457,7 @@ def query_gemini(model_prefix, contents):
         print(f"generate_kwargs: {generate_kwargs}\n\nOUTPUT:\n")
         response = client.models.generate_content(**generate_kwargs)
 
-        response_text = response.text if response.text else ""
+        response_text = _extract_text(response)
         response_data = parse_response_text(response_text)
 
         usage = getattr(response, "usage_metadata", None)
@@ -442,7 +466,14 @@ def query_gemini(model_prefix, contents):
 
         return {
             "response_data": response_data,
-            "token_usage": token_usage
+            "token_usage": token_usage,
+            "metadata": {
+                "finish_reason": response.candidates[0].finish_reason.name if response.candidates else "N/A",
+                "safety_ratings": [
+                    {"category": r.category.name, "probability": r.probability.name}
+                    for r in response.candidates[0].safety_ratings
+                ] if response.candidates and response.candidates[0].safety_ratings else []
+            }
         }
     except Exception as e:
         raise e
@@ -499,9 +530,12 @@ def analyze_image(model_prefix, prompt, image_path):
         )
 
         response_text = _extract_text(response)
+        token_usage = extract_token_usage(getattr(response, "usage_metadata", None))
+        token_usage["model"] = model
+
         return {
             "response_data": parse_response_text(response_text),
-            "token_usage": extract_token_usage(getattr(response, "usage_metadata", None)),
+            "token_usage": token_usage,
             "metadata": {
                 "finish_reason": response.candidates[0].finish_reason.name if response.candidates else "N/A",
                 "safety_ratings": [
@@ -557,9 +591,12 @@ def edit_image(model_prefix, prompt, image_path, output_path):
         file_obj = _upload_file(client, image_path)
         file_obj = _wait_for_file_active(client, file_obj)
 
-        # 3. Ensure image output modality is requested
+        # 3. Ensure image output modality is requested.
+        # If the user has not set response_modalities, default to both TEXT and IMAGE
+        # so that any text returned by the model (e.g. image understanding) is captured.
+        # If the user explicitly set response_modalities, honour their choice.
         if "response_modalities" not in gen_config:
-            gen_config["response_modalities"] = ["IMAGE"]
+            gen_config["response_modalities"] = ["TEXT", "IMAGE"]
 
         genai = import_genai()
         response = client.models.generate_content(
@@ -592,9 +629,12 @@ def edit_image(model_prefix, prompt, image_path, output_path):
 
         # 5. Return structured result
         response_text = _extract_text(response)
+        token_usage = extract_token_usage(getattr(response, "usage_metadata", None))
+        token_usage["model"] = model
+
         return {
             "response_data": parse_response_text(response_text),
-            "token_usage": extract_token_usage(getattr(response, "usage_metadata", None)),
+            "token_usage": token_usage,
             "metadata": {
                 "image_saved": image_found,
                 "output_path": output_path if image_found else None,

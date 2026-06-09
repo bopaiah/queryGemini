@@ -13,3 +13,4 @@ Please analyze the weather and geographic profile of the following city:
 
 ## Task
 Based on the current date of {{CURRENT_DATE}} and the details above, provide a comprehensive 3-day forecast summary and list top 3 geographic highlights or local travel tips for this city.
+OUTPUT: generate valid json response.
