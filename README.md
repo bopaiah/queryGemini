@@ -1,8 +1,10 @@
 # queryGemini — Gemini Query & Prompt Utility
 
-A modular Python toolkit for querying Google's Gemini models via CLI or as a library.
-Supports named prompt templates, dynamic variable injection, image analysis, image editing,
-and seamless local/GCP environment configuration.
+A modular Python toolkit for interacting with Google’s Gemini models via both CLI and library interfaces. It enables the creation and management of reusable prompt templates with dynamic variable injection, supporting advanced workflows such as image analysis and image editing.
+
+Designed for flexibility across local and GCP environments, the toolkit simplifies configuration and execution of complex, multi-layered prompt pipelines. It allows developers to build and maintain a centralized model and prompt library, making it easier to scale and manage GenAI applications.
+
+By abstracting implementation details, it reduces engineering overhead and provides a clean, efficient way to test, deploy, and iterate on sophisticated prompt-driven systems.
 
 Developed by **Bopaiah Mekerira**.
 
